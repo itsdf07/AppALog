@@ -1,5 +1,16 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
+publish {
+//    gradlew clean build bintrayUpload -PbintrayUser=itsdf07 -PbintrayKey=1c5219c87ea1a4db9edc945156def8accae2367 -PdryRun=false
+//    https://bintray.com/itsdf07/maven
+    userOrg = 'itsdf07'//bintray.com用户名
+    groupId = 'com.itsdf07'//jcenter上的路径
+    artifactId = 'lib-alog'//项目名称
+    publishVersion = '1.0.2'//版本号
+    desc = ''//描述，不重要
+    website = 'https://github.com/itsdf07'//网站，最好有，不重要
+}
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0.3"
@@ -8,7 +19,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.2"
     }
     buildTypes {
         release {

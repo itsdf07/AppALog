@@ -1,4 +1,4 @@
-## ALogUtils是用来干嘛的？
+## AppALog是用来干嘛的？
 仅提供对android.util.Log的重新封装，自定义属于自己风格的ALog打印
 
 ## 对于module baseutils的使用
@@ -14,7 +14,7 @@
 * 需要依赖该工具库的Module中的'build.gradle'中添加'compile'依赖
 ```javascript
     dependencies {
-        compile 'com.itsdf07:alog:1.0.1'
+        compile 'com.itsdf07:lib-alog:1.0.2'
     }
 ```
 ## 对ALog的使用

@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AppALog.iml" filepath="$PROJECT_DIR$/AppALog.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libalog/libalog.iml" filepath="$PROJECT_DIR$/libalog/libalog.iml" />
     </modules>
   </component>
 </project>

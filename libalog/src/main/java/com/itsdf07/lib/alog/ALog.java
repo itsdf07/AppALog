@@ -9,7 +9,6 @@ package com.itsdf07.lib.alog;
  * .setLog2Local(true) //设置是否本地存储log记录
  * .setShowThreadInfo(true)//是否显示线程信息
  * .setMethodCount(2) //显示函数栈中的方法数
- * .setMethodOffset(0); //控制从函数栈中的具体位置显示MethodCount数量的函数
  * @Author itsdf07
  * @E-Mail 923255742@qq.com
  * @Github https://github.com/itsdf07

@@ -62,14 +62,14 @@ public class ALoggerImpl implements IALogger {
     private static final String MIDDLE_BORDER = MIDDLE_CORNER + SINGLE_DIVIDER + SINGLE_DIVIDER;
 
     /**
-     * It is used to determine log settings such as method count, thread info visibility
+     * ALog配置对象
      */
     private final ALogSettings mALogSettings = new ALogSettings();
 
     /**
-     * Android 的单条Log打印最大限制是4076字节，所以这边限制Log块最大限制为4000字节，默认编码为UTF-8
+     * Android 的单条Log打印最大限制是4096字节(4k)，所以这边限制Log块最大限制为1024个字符串长度，默认编码为UTF-8(汉子占3个字节长度)
      */
-    private static final int CHUNK_SIZE = 4000;
+    private static final int CHUNK_LENGTH = 1024;
 
     /**
      * It is used for json pretty print
@@ -77,9 +77,9 @@ public class ALoggerImpl implements IALogger {
     private static final int JSON_INDENT = 2;
 
     /**
-     * The minimum stack trace index, starts at this class after two native calls.
+     * 从StackTraceElement[]数据开始遍历的位置，值为自定义，影响遍历的次数
      */
-    private static final int MIN_STACK_OFFSET = 3;
+    private static final int MIN_STACK_OFFSET = 2;
 
 
     @Override
@@ -167,8 +167,8 @@ public class ALoggerImpl implements IALogger {
         if (getALogSettings().getLogLevel() == ALogLevel.NONE) {
             return;
         }
-        if (throwable != null) {
-            if (message != null) {
+        if (null != throwable) {
+            if (null != message) {
                 message += ":" + ALogHelper.getStackTraceString(throwable);
             } else {
                 message = ALogHelper.getStackTraceString(throwable);
@@ -182,16 +182,15 @@ public class ALoggerImpl implements IALogger {
         int methodCount = getALogSettings().getMethodCount();
 
         logTopBorder(priority, tag);
-        logHeaderContent(priority, tag, methodCount);
+        logThreadContent(priority, tag, methodCount);
 
-        //get bytes of message with system's default charset (which is UTF-8 for Android)
-        byte[] bytes = message.getBytes();
-        int length = bytes.length;
+        message = "[ALog-Content] " + message;
+        int messageLength = message.length();
         //内容打印：
-        if (length <= CHUNK_SIZE) {
+        if (messageLength <= CHUNK_LENGTH) {//不需要分段输出的log信息
             if (methodCount > 0) {
                 if (getALogSettings().isShowThreadInfo()) {
-                    logDivider(priority, tag);
+                    logDivider(priority, tag);//需要打印线程信息时的分割线
                 }
             }
             logContent(priority, tag, message);
@@ -203,11 +202,11 @@ public class ALoggerImpl implements IALogger {
                 logDivider(priority, tag);
             }
         }
-        for (int i = 0; i < length; i += CHUNK_SIZE) {
-            int count = Math.min(length - i, CHUNK_SIZE);
-            //create a new String with system's default charset (which is UTF-8 for Android)
-            logContent(priority, tag, new String(bytes, i, count));
+        for (int i = 0; i < messageLength; i += CHUNK_LENGTH) {//分次打印过长log信息
+            int count = Math.min(messageLength - i, CHUNK_LENGTH);
+            logContent(priority, tag, message.substring(i, i + count));
         }
+
         logBottomBorder(priority, tag);
     }
 
@@ -215,7 +214,13 @@ public class ALoggerImpl implements IALogger {
 
 
     /**
-     * This method is synchronized in order to avoid messy of logs' order.
+     * 这个方法必须同步的，以避免混乱的日志顺序。
+     *
+     * @param tag       TAG
+     * @param priority  Log打印级别：v、d、i、w、e、a
+     * @param throwable 异常
+     * @param msg       打印内容
+     * @param args      打印内容参数
      */
     private synchronized void log(String tag, int priority, Throwable throwable, String msg, Object... args) {
         if (getALogSettings().getLogLevel() == ALogLevel.NONE) {
@@ -238,7 +243,7 @@ public class ALoggerImpl implements IALogger {
     }
 
     /**
-     * Log块上边界线╔════════════════════════════════════════════════════════════════════════════════════════
+     * Log块上边界线╔══════════════════════════════
      *
      * @param logType
      * @param tag
@@ -248,20 +253,41 @@ public class ALoggerImpl implements IALogger {
     }
 
     /**
-     * 打印当前Log所在线程 和 方法调用栈顺序的数量
+     * 打印当前Log所在线程 和 方法调用栈顺序
      *
-     * @param logType
-     * @param tag
-     * @param methodCount Log调用方法栈顺序的数量
+     * @param logType     Log打印级别：v、d、i、w、e、a
+     * @param tag         TAG
+     * @param methodCount 显示Log调用方法栈顺序的数量
      */
     @SuppressWarnings("StringBufferReplaceableByString")
-    private void logHeaderContent(int logType, String tag, int methodCount) {
+    private void logThreadContent(int logType, String tag, int methodCount) {
         if (!getALogSettings().isShowThreadInfo()) {
             return;
         }
+        //打印线程名称，如 Thread:main
         logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + "Thread:" + Thread.currentThread().getName());
+        //绘制线程名称与方法调用信息之间的分割线
         logDivider(logType, tag);
         String level = "";
+
+//        result = {StackTraceElement[17]@5284}
+//        0 = {StackTraceElement@5289} "dalvik.system.VMStack.getThreadStackTrace(Native Method)"
+//        1 = {StackTraceElement@5290} "java.lang.Thread.getStackTrace(Thread.java:1556)"
+//        2 = {StackTraceElement@5291} "com.itsdf07.lib.alog.ALoggerImpl.logThreadContent(ALoggerImpl.java:274)"
+//        3 = {StackTraceElement@5292} "com.itsdf07.lib.alog.ALoggerImpl.log(ALoggerImpl.java:185)"
+//        4 = {StackTraceElement@5293} "com.itsdf07.lib.alog.ALoggerImpl.log(ALoggerImpl.java:225)"
+//        5 = {StackTraceElement@5294} "com.itsdf07.lib.alog.ALoggerImpl.d(ALoggerImpl.java:97)"
+//        6 = {StackTraceElement@5295} "com.itsdf07.lib.alog.ALog.dTag(ALog.java:109)"
+//        7 = {StackTraceElement@5296} "com.itsdf07.app.alog.MainActivity$1.onClick(MainActivity.java:20)"
+//        8 = {StackTraceElement@5297} "android.view.View.performClick(View.java:6291)"
+//        9 = {StackTraceElement@5298} "android.view.View$PerformClick.run(View.java:24931)"
+//        10 = {StackTraceElement@5299} "android.os.Handler.handleCallback(Handler.java:808)"
+//        11 = {StackTraceElement@5300} "android.os.Handler.dispatchMessage(Handler.java:101)"
+//        12 = {StackTraceElement@5301} "android.os.Looper.loop(Looper.java:166)"
+//        13 = {StackTraceElement@5302} "android.app.ActivityThread.main(ActivityThread.java:7425)"
+//        14 = {StackTraceElement@5303} "java.lang.reflect.Method.invoke(Native Method)"
+//        15 = {StackTraceElement@5304} "com.android.internal.os.Zygote$MethodAndArgsCaller.run(Zygote.java:245)"
+//        16 = {StackTraceElement@5305} "com.android.internal.os.ZygoteInit.main(ZygoteInit.java:921)"
         /**
          * Thread.currentThread().getStackTrace()
          * 返回一个表示该线程堆栈转储的堆栈跟踪元素数组。
@@ -271,7 +297,7 @@ public class ALoggerImpl implements IALogger {
          */
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 
-        //倒序的方法堆栈中指向的方法名索引
+        //从StackTraceElement[] trace中倒序输出方法堆栈中的终止索引
         int stackOffset = getStackOffset(trace) + getALogSettings().getMethodOffset();
 
         //corresponding method count with the current stack may exceeds the stack trace. Trims the count
@@ -279,6 +305,10 @@ public class ALoggerImpl implements IALogger {
             methodCount = trace.length - stackOffset - 1;
         }
 
+        /**
+         * 如上面StackTraceElement[]信息中，methodCount=2，stackOffset=6，那么下列for循环的内容则为
+         * 从索引值=8的地方开始反序输出信息，即分别依次输出索引值为 8 和 7 的堆栈信息
+         */
         for (int i = methodCount; i > 0; i--) {
             int stackIndex = i + stackOffset;
             if (stackIndex >= trace.length) {
@@ -314,8 +344,8 @@ public class ALoggerImpl implements IALogger {
     /**
      * 横线绘制："════════════════════════════════════════════";
      *
-     * @param logType
-     * @param tag
+     * @param logType Log打印级别：v、d、i、w、e、a
+     * @param tag     TAG
      */
     private void logDivider(int logType, String tag) {
         logChunk(logType, tag, MIDDLE_BORDER);
@@ -330,9 +360,8 @@ public class ALoggerImpl implements IALogger {
      * @param chunk
      */
     private void logContent(int logType, String tag, String chunk) {
-        if (!getALogSettings().isShowThreadInfo()) {
+        if (!getALogSettings().isShowThreadInfo()) {//解读可参考logThreadContent中的逻辑解读
             StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-            //倒序的方法堆栈中指向的方法名索引
             int stackOffset = getStackOffset(trace) + getALogSettings().getMethodOffset() - 1;
             int methodCount = getALogSettings().getMethodCount();
             //corresponding method count with the current stack may exceeds the stack trace. Trims the count
@@ -364,7 +393,7 @@ public class ALoggerImpl implements IALogger {
     }
 
     /**
-     * Log打印
+     * Log内容打印
      *
      * @param logType
      * @param tag
@@ -413,11 +442,10 @@ public class ALoggerImpl implements IALogger {
     }
 
     /**
-     * Determines the starting index of the stack trace, after method calls made by this class.
-     * 在这个类的方法调用之后，确定堆栈跟踪的起始索引。
+     * StackTraceElement[] trace堆栈中，与ALog相关类无关开始索引点
      *
-     * @param trace the stack trace
-     * @return the stack offset
+     * @param trace 堆栈信息
+     * @return StackTraceElement[]堆栈中正序与ALog相关类中有关的最后索引，也可理解为反序中与ALog相关类中无关的第一个索引
      */
     private int getStackOffset(StackTraceElement[] trace) {
         for (int i = MIN_STACK_OFFSET; i < trace.length; i++) {
@@ -426,6 +454,25 @@ public class ALoggerImpl implements IALogger {
             //过滤掉ALog相关类中的Log信息打印，防止Log混乱
             if (!name.equals(ALoggerImpl.class.getName()) && !name.equals(ALog.class.getName())) {
                 return --i;
+                //例如以下trace中，进入该条件时i=7，最终返回6出去
+//                result = {StackTraceElement[17]@5284}
+//                0 = {StackTraceElement@5289} "dalvik.system.VMStack.getThreadStackTrace(Native Method)"
+//                1 = {StackTraceElement@5290} "java.lang.Thread.getStackTrace(Thread.java:1556)"
+//                2 = {StackTraceElement@5291} "com.itsdf07.lib.alog.ALoggerImpl.logThreadContent(ALoggerImpl.java:274)"
+//                3 = {StackTraceElement@5292} "com.itsdf07.lib.alog.ALoggerImpl.log(ALoggerImpl.java:185)"
+//                4 = {StackTraceElement@5293} "com.itsdf07.lib.alog.ALoggerImpl.log(ALoggerImpl.java:225)"
+//                5 = {StackTraceElement@5294} "com.itsdf07.lib.alog.ALoggerImpl.d(ALoggerImpl.java:97)"
+//                6 = {StackTraceElement@5295} "com.itsdf07.lib.alog.ALog.dTag(ALog.java:109)"
+//                7 = {StackTraceElement@5296} "com.itsdf07.app.alog.MainActivity$1.onClick(MainActivity.java:20)"
+//                8 = {StackTraceElement@5297} "android.view.View.performClick(View.java:6291)"
+//                9 = {StackTraceElement@5298} "android.view.View$PerformClick.run(View.java:24931)"
+//                10 = {StackTraceElement@5299} "android.os.Handler.handleCallback(Handler.java:808)"
+//                11 = {StackTraceElement@5300} "android.os.Handler.dispatchMessage(Handler.java:101)"
+//                12 = {StackTraceElement@5301} "android.os.Looper.loop(Looper.java:166)"
+//                13 = {StackTraceElement@5302} "android.app.ActivityThread.main(ActivityThread.java:7425)"
+//                14 = {StackTraceElement@5303} "java.lang.reflect.Method.invoke(Native Method)"
+//                15 = {StackTraceElement@5304} "com.android.internal.os.Zygote$MethodAndArgsCaller.run(Zygote.java:245)"
+//                16 = {StackTraceElement@5305} "com.android.internal.os.ZygoteInit.main(ZygoteInit.java:921)"
             }
         }
         return -1;
@@ -491,7 +538,7 @@ public class ALoggerImpl implements IALogger {
             case DEBUG:
                 // Fall through, log debug by default
             default:
-                type = "d";
+                type = "other";
                 break;
         }
         return type;

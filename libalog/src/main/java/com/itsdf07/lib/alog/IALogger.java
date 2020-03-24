@@ -10,6 +10,9 @@ package com.itsdf07.lib.alog;
 
 public interface IALogger {
 
+    /**
+     * @return ALog的相关配置对象
+     */
     ALogSettings getALogSettings();
 
     /**
@@ -71,21 +74,21 @@ public interface IALogger {
     void wtf(String tag, Throwable throwable, String message, Object... args);
 
     /**
-     * Formats the json content and print it
+     * 格式化并打印json内容
      *
-     * @param json the json content
+     * @param json JSON传
      */
     void json(String json);
 
     /**
-     * Formats the json content and print it
+     * 格式化并打印xml内容
      *
-     * @param xml the xml content
+     * @param xml xml串
      */
     void xml(String xml);
 
     /**
-     * Log打印处理
+     * Log打印内容封装
      *
      * @param tag       tag
      * @param priority  Log打印级别：v、d、i、w、e、a

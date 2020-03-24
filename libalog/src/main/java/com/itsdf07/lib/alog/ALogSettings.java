@@ -59,7 +59,7 @@ public final class ALogSettings {
      */
     private int methodCount = 2;
     /**
-     * 设置Log信息中打印函数栈的起始位置，即用于控制需要打印哪几个(methodCount)函数
+     * 负责设置StackTraceElement[]堆栈中函数信息打印索引控制
      */
     private int methodOffset = 0;
 
@@ -203,7 +203,7 @@ public final class ALogSettings {
      *
      * @param methodOffset
      */
-    public ALogSettings setMethodOffset(int methodOffset) {
+    ALogSettings setMethodOffset(int methodOffset) {
         this.methodOffset = methodOffset;
         return this;
     }

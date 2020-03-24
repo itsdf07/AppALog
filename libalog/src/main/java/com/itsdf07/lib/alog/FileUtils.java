@@ -24,7 +24,6 @@ import java.util.ArrayList;
  * @Github https://github.com/itsdf07
  * @Date 2020/1/8
  */
-
 public class FileUtils {
     private static final String TAG = "FileUtils";
 

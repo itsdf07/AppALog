@@ -8,7 +8,7 @@ package com.itsdf07.lib.alog;
  * @Date 2020/1/8
  */
 
-public interface IALogAdapter {
+interface IALogAdapter {
     /**
      * 详细 - 显示所有日志消息（默认值）
      *

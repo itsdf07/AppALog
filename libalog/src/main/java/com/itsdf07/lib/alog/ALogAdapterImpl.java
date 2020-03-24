@@ -9,7 +9,7 @@ import android.util.Log;
  * @Github https://github.com/itsdf07
  * @Date 2020/1/8
  */
-public class ALogAdapterImpl implements IALogAdapter {
+class ALogAdapterImpl implements IALogAdapter {
     @Override
     public void v(String tag, String message) {
         Log.v(tag, message);

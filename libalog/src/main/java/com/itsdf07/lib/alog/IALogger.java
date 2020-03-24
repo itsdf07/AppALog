@@ -8,7 +8,7 @@ package com.itsdf07.lib.alog;
  * @Date 2020/1/8
  */
 
-public interface IALogger {
+interface IALogger {
 
     /**
      * @return ALog的相关配置对象

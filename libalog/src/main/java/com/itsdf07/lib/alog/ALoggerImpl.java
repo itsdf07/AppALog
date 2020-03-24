@@ -30,7 +30,7 @@ import javax.xml.transform.stream.StreamSource;
  * @Date 2020/1/8
  */
 
-public class ALoggerImpl implements IALogger {
+class ALoggerImpl implements IALogger {
     /**
      * 日期格式
      */

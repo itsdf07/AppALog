@@ -12,7 +12,7 @@ import java.net.UnknownHostException;
  * @Date 2020/1/8
  */
 
-public final class ALogHelper {
+final class ALogHelper {
 
     /**
      * Copied from "android.util.Log.getStackTraceString()" in order to avoid usage of Android stack

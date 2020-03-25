@@ -16,39 +16,9 @@ package com.itsdf07.lib.alog;
  */
 
 public final class ALog {
-    /**
-     * 详细 - 显示所有日志消息（默认值）
-     */
-    public static final int VERBOSE = 2;
-    /**
-     * 调试 - 显示仅在开发期间有用的调试日志消息，以及此列表中的消息级别较低
-     */
-    public static final int DEBUG = 3;
-    /**
-     * 信息 - 显示常规使用的预期日志消息以及此列表中的消息级别
-     */
-    public static final int INFO = 4;
-    /**
-     * 警告 - 显示尚未出现错误的可能问题，以及此列表中的消息级别
-     */
-    public static final int WARN = 5;
-    /**
-     * 错误 - 显示导致错误的问题，以及此列表中的消息级别较低
-     */
-    public static final int ERROR = 6;
-    /**
-     * 断言 - 显示开发人员期望永远不会发生的问题
-     */
-    public static final int ASSERT = 7;
 
-    /**
-     * ALog内容打印实现类
-     */
     private static ALoggerImpl mALogger = new ALoggerImpl();
 
-    /**
-     * 初始化ALog相关：
-     */
     public static ALogSettings init() {
         if (mALogger == null) {
             mALogger = new ALoggerImpl();
@@ -77,7 +47,7 @@ public final class ALog {
     }
 
     /**
-     * ALog.v("dfsu", "isFIleExist = %s, innerBasePath = %s", isFileExist, innerBasePath);
+     * ALog.v("itsdf07", "isFIleExist = %s, innerBasePath = %s", isFileExist, innerBasePath);
      *
      * @param tag     tag
      * @param message 要打印的内容
@@ -87,23 +57,10 @@ public final class ALog {
         mALogger.v(tag, message, args);
     }
 
-    /**
-     * ALog.d("isFIleExist = %s, innerBasePath = %s", isFileExist, innerBasePath);
-     *
-     * @param message 要打印的内容
-     * @param args    打印信息中的动态数据
-     */
     public static void d(String message, Object... args) {
         dTag(mALogger.getALogSettings().getTag(), message, args);
     }
 
-    /**
-     * ALog.d("dfsu", "isFIleExist = %s, innerBasePath = %s", isFileExist, innerBasePath);
-     *
-     * @param tag     tag
-     * @param message 要打印的内容
-     * @param args    打印信息中的动态数据
-     */
     public static void dTag(String tag, String message, Object... args) {
         mALogger.d(tag, message, args);
     }
@@ -149,16 +106,16 @@ public final class ALog {
     }
 
     /**
-     * Formats the json content and print it
+     * JSON格式数据打印
      *
-     * @param json the json content
+     * @param json
      */
     public static void json(String json) {
         mALogger.json(json);
     }
 
     /**
-     * Formats the json content and print it
+     * XML格式数据打印
      *
      * @param xml the xml content
      */

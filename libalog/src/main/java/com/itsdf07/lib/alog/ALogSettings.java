@@ -81,17 +81,17 @@ public final class ALogSettings {
      */
     public ALogSettings setTag(String tag) {
         if (null == tag) {
-            throw new NullPointerException("tag may not be null");
+            throw new NullPointerException("TAG 不能设置 null");
         }
         if (tag.trim().length() == 0) {
-            throw new IllegalStateException("tag may not be empty");
+            throw new IllegalStateException("TAG 不能设置为空字符串");
         }
         this.TAG = tag;
         return this;
     }
 
     /**
-     * 是否本地保存Log信息
+     * 是否开启本地保存Log信息
      *
      * @return
      */
@@ -141,16 +141,6 @@ public final class ALogSettings {
      */
     public boolean isShowThreadInfo() {
         return isShowThreadInfo;
-    }
-
-    /**
-     * 不打印线程信息
-     *
-     * @return
-     */
-    public ALogSettings hideThreadInfo() {
-        isShowThreadInfo = false;
-        return this;
     }
 
     /**

@@ -40,17 +40,32 @@ class ALoggerImpl implements IALogger {
      * 保证Log不会错开打印
      */
     private static ExecutorService mExecutorService = Executors.newSingleThreadExecutor();
-
-    private static final int VERBOSE = ALog.VERBOSE;
-    private static final int DEBUG = ALog.DEBUG;
-    private static final int INFO = ALog.INFO;
-    private static final int WARN = ALog.WARN;
-    private static final int ERROR = ALog.ERROR;
-    private static final int ASSERT = ALog.ASSERT;
-
     /**
-     * Drawing toolbox
+     * 详细 - 显示所有日志消息（默认值）
      */
+    public static final int VERBOSE = 2;
+    /**
+     * 调试 - 显示仅在开发期间有用的调试日志消息，以及此列表中的消息级别较低
+     */
+    public static final int DEBUG = 3;
+    /**
+     * 信息 - 显示常规使用的预期日志消息以及此列表中的消息级别
+     */
+    public static final int INFO = 4;
+    /**
+     * 警告 - 显示尚未出现错误的可能问题，以及此列表中的消息级别
+     */
+    public static final int WARN = 5;
+    /**
+     * 错误 - 显示导致错误的问题，以及此列表中的消息级别较低
+     */
+    public static final int ERROR = 6;
+    /**
+     * 断言 - 显示开发人员期望永远不会发生的问题
+     */
+    public static final int ASSERT = 7;
+
+    //绘制Log块的分割线
     private static final char TOP_LEFT_CORNER = '╔';
     private static final char BOTTOM_LEFT_CORNER = '╚';
     private static final char MIDDLE_CORNER = '╟';
@@ -72,12 +87,12 @@ class ALoggerImpl implements IALogger {
     private static final int CHUNK_LENGTH = 1024;
 
     /**
-     * It is used for json pretty print
+     * JSON缩进空格数
      */
     private static final int JSON_INDENT = 2;
 
     /**
-     * 从StackTraceElement[]数据开始遍历的位置，值为自定义，影响遍历的次数
+     * 从StackTraceElement[] 数据开始遍历的位置，值为自定义，影响遍历的次数
      */
     private static final int MIN_STACK_OFFSET = 2;
 

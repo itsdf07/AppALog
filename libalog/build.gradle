@@ -7,7 +7,7 @@ publish {
     userOrg = 'itsdf07'//bintray.com用户名
     groupId = 'com.itsdf07'//jcenter上的路径
     artifactId = 'lib-alog'//项目名称
-    publishVersion = '2.0.1'//版本号
+    publishVersion = '2.0.2'//版本号
     desc = ''//描述，不重要
     website = 'https://github.com/itsdf07'//网站，最好有，不重要
 }
@@ -18,8 +18,6 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 26
-        versionCode 1
-        versionName "2.0.1"
     }
     buildTypes {
         release {

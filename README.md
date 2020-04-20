@@ -24,7 +24,7 @@ buildscript {
 ```
 - 在需要使用该工具库的Module中的`build.gradle`中添加依赖
 ```bash
-compile 'com.itsdf07:lib-alog:2.0.2'
+compile 'com.itsdf07:lib-alog:2.0.3'
 ```
 # 使用方式
 ## 初始化过程
